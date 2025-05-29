@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All about you</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: url('https://imgur.com/4mYHxKQ.jpg') no-repeat center center/cover;
+      backdrop-filter: blur(8px);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: white;
+      position: relative;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      overflow-y: auto;
+      max-height: 80vh;
+      box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+
+    .bubble {
+      background-color: hwb(323 44% 7% / 0.865);
+      padding: 12px 18px;
+      border-radius: 20px;
+      margin: 10px 0;
+      width: fit-content;
+      max-width: 90%;
+      animation: fadeInUp 0.5s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      color: #ffffff;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    audio {
+      display: none;
+    }
+
+    /* Hati kecil */
+    .heart {
+      position: fixed;
+      top: -30px;
+      width: 20px;
+      height: 18px;
+      background: #ff4567;
+      transform: rotate(-45deg);
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 18px;
+      background: #ff4567;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .heart::before {
+      top: 0;
+      left: 10px;
+    }
+
+    .heart::after {
+      top: -10px;
+      left: 0;
+    }
+
+    @keyframes fall {
+      0% {
+        top: -30px;
+        opacity: 1;
+        transform: translateX(0) rotate(-45deg);
+      }
+
+      100% {
+        top: 110vh;
+        opacity: 0;
+        transform: translateX(30px) rotate(-45deg);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        padding: 15px;
+        max-width: 90%;
+        height: 80vh;
+        font-size: 16px;
+      }
+
+      body {
+        background-size: cover;
+        background-attachment: fixed;
+      }
+
+      .bubble {
+        font-size: 16px;
+        padding: 14px 16px;
+        line-height: 1.5;
+      }
+
+      .heart {
+        /* ubah dari 100vw ke width yang aman */
+        left: calc(100% - 20px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container" id="chat"></div>
+
+  <audio id="bg-music" autoplay muted loop>
+    <source
+      src="https://dl.dropboxusercontent.com/scl/fi/fvp93luscvcibcplekm98/tiktokio.com_WLdxGdxcx5MteRow9iiB.mp3?rlkey=9tmoei70xlpt1spqzd5q9vshc&st=kbro96g5&dl=0"
+      type="audio/mp3">
+  </audio>
+
+  <script>
+    window.addEventListener('click', function () {
+      const audio = document.getElementById('bg-music');
+      audio.muted = false;
+      audio.play();
+    }, { once: true });
+   </script>
+
+  <script>
+    const messages = [
+      "naii sku sadar... mungkin aku terlalu banyak nanya, terlalu sering nyari kepastian dari hal-hal yang harusnya cukup dirasain, bukan diomongin terus",
+      "Aku sempat lupa gimana caranya jadi teman ngobrol yang santai, yang asik, yang kamu suka dulu, Maaf ya, kalau semua itu bikin kamu gak nyaman",
+      "Aku gak nyalahin kamu kalau kamu ngerasa menjauh, karena aku juga sadar, aku sempat terlalu takut, terlalu tegang, terlalu emosional",
+      "Padahal aku cuma pengen lebih deket, lebih ngerti kamu, tapi karena caraku salah, jadinya malah kayak ngejar ngejar",
+      "Mulai sekarang, aku pengen belajar untuk lebih tenang, ngedengerin kamu lebih banyak, nanya lebih sedikit, dan bikin suasana jadi ringan lagi",
+      "Gak usah langsung balik seperti dulu, pelan-pelan aja, asal kamu tahu, aku masih di sini",
+      "Bukan buat maksa kamu buka hati, tapi buat nemenin dari jarak yang kamu anggap aman"
+
+    ];
+
+    const chatContainer = document.getElementById('chat');
+    let index = 0;
+
+    function addMessage() {
+      if (index >= messages.length) return;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      chatContainer.appendChild(bubble);
+
+      let msg = messages[index];
+      let charIndex = 0;
+
+      function typeChar() {
+        if (charIndex < msg.length) {
+          bubble.textContent += msg.charAt(charIndex);
+          charIndex++;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+          setTimeout(typeChar, 25);
+        } else {
+          index++;
+          setTimeout(addMessage, 800);
+        }
+      }
+
+      typeChar();
+    }
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = 5 + Math.random() * 2 + 's';
+      document.body.appendChild(heart);
+      setTimeout(() => {
+        heart.remove();
+      }, 7000); // hapus hati setelah animasi selesai
+    }
+    setInterval(createHeart, 500);
+
+    window.onload = () => {
+      addMessage();
+    };
+    // Tambahkan smooth scroll agar bubble tidak kepotong saat muncul
+    chatContainer.style.scrollBehavior = 'smooth';
+  </script>
+</body>
+
+</html>
